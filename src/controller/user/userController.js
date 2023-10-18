@@ -1,20 +1,24 @@
 const { PrismaClient } = require("@prisma/client");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 const prisma = new PrismaClient();
+
+const cryptPassword = async (password) => {
+    const salt = await bcrypt.genSalt(5);
+    return bcrypt.hash(password, salt);
+}
 
 module.exports = {
     registerUser: async (req, res) => {
         // menambahkan data kedalam table user dan profiles
         try {
             const { name, email, password, identity_number, identity_type, address } = req.body;
-            const encrypt = await bcrypt.genSalt();
-            const hashPassword = await bcrypt.hash(password, encrypt);
             const user = await prisma.users.create({
                 data: {
                     name: name,
                     email: email,
-                    password: hashPassword,
+                    password: await cryptPassword(password),
                     profile: {
                         create: {
                             identity_number: identity_number,
@@ -44,6 +48,47 @@ module.exports = {
                 message: "Internal server error"
             })
         }
+    },
+
+
+    loginUser: async (req, res) => {
+        const findUser = await prisma.users.findFirst({
+            where: {
+                email: req.body.email
+            }
+        })
+
+        if (!findUser) {
+            return res.status(404).json({
+                error: "Users Not Found"
+            })
+        }
+
+        if (bcrypt.compareSync(req.body.password, findUser.password)) {
+            const token = jwt.sign({ id: findUser.id }, 'secret_key', {
+                expiresIn: '6h'
+            })
+
+            return res.status(200).json({
+                data: { token }
+            })
+        }
+        return res.status(403).json({
+            error: "Invalid Credentials"
+        })
+    },
+
+
+    getProfile: async (req, res) => {
+        const user = await prisma.users.findUnique({
+            where: {
+                id: res.user.id
+            }
+        })
+
+        return res.status(200).json({
+            data: user
+        })
     },
 
 
