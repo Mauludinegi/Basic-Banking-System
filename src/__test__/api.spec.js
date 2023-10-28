@@ -1,9 +1,7 @@
 const request = require('supertest'),
     { app, server } = require('../utils/createServer');
-const jwt = require('jsonwebtoken');
 const createToken = require('../utils/createToken')
 require('dotenv').config();
-const secret_key = process.env.JWT_KEY || 'no_secret';
 
 
 
@@ -131,6 +129,7 @@ describe('GET /api/v1/auth/authenticate', () => {
         expect(response.status).toBe(401);
     });
 });
+
 
 afterAll(() => {
     server.close();
