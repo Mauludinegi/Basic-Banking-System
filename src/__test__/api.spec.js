@@ -112,7 +112,6 @@ describe('GET /api/v1/auth/authenticate', () => {
     it('should return user profile with valid token', async () => {
 
         const validToken = await createToken({ id: 1, username: 'test@example.com' });
-        // Lakukan permintaan GET ke endpoint /api/v1/auth/authenticate dengan token yang valid
         const response = await request(app)
             .get('/api/v1/auth/authenticate')
             .set('Authorization', `Bearer ${validToken}`);
@@ -122,7 +121,6 @@ describe('GET /api/v1/auth/authenticate', () => {
             expect(response.body.data).toHaveProperty('email');
             expect(response.body.data).toHaveProperty('name');
             expect(response.body.data).toHaveProperty('profile');
-        // Selainnya, Anda dapat menambahkan lebih banyak pengujian sesuai kebutuhan Anda
     });
 
     it('should return 401 Unauthorized with invalid token', async () => {
