@@ -8,6 +8,7 @@ const swaggerJson = require("./openApi.json");
 require('dotenv').config();
 
 const PORT = process.env.PORT || 3000;
+const PORT_TEST = process.env.PORT_TEST || 3000;
 
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -17,21 +18,16 @@ app.use(bodyParser.json());
 router.use("/documentation", swaggerUi.serve, swaggerUi.setup(swaggerJson))
 app.use(router);
 
-router.use((err, req, res, next) => {
-    console.log(err);
-    res.status(500).json({
-        status: 'fail',
-        errors: err.message
+app.get('*', (req, res) => {
+    return res.status(404).json({
+        error: 'End point is not registered'
     })
 })
 
-router.use((err, req, res, next) => {
-    res.status(404).json({
-        status: 'fail',
-        errors: 'Are you lost?'
-    })
-})
 
 app.listen(PORT, () => {
     console.log(`server jalan di http://localhost:${PORT}`);
 })
+
+
+module.exports = app;

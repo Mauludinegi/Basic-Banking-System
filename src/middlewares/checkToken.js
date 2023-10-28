@@ -6,7 +6,7 @@ const checkToken = (req, res, next) => {
     let token = req.headers.authorization;
 
     if (!token) {
-        return res.status(403).json({
+        return res.status(401).json({
             error: 'please provide a token'
         })
     }
@@ -15,17 +15,16 @@ const checkToken = (req, res, next) => {
         token = token.slice('bearer'.length).trim()
     }
 
-    const jwtPayload = jwt.verify(token, secret_key)
-
-    if (!jwtPayload) {
-        return res.status(403).json({
+    try {
+        const jwtPayload = jwt.verify(token, secret_key);
+        res.user = jwtPayload;
+        next();
+    } catch (error) {
+        return res.status(401).json({
             error: 'unauthenticated'
-        })
+        });
     }
 
-    res.user = jwtPayload
-
-    next()
 }
 
 module.exports = checkToken
