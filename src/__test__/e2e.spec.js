@@ -48,8 +48,9 @@ describe('BASIC BANK API', () => {
 
             expect(update.status).toBe(200);
             expect(update.body.message).toBe('User and profile updated successfully');
+            
 
-
+            // =========== TESTING DELETE ============
             const userIdDelete = 1;
 
             const deleteUser = await request(app).delete(`/api/v1/users/${userIdDelete}`);
